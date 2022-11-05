@@ -1,0 +1,1 @@
+Spinnaker SDK available at https://www.flir.com/products/spinnaker-sdk/?vertical=machine+vision&segment=iis
