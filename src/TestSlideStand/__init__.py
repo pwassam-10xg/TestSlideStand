@@ -7,6 +7,7 @@ import coloredlogs
 from camera import Cam
 from stage import Stage
 import numpy as np
+from TestSlideStand.analysis import ImageAnalyzer
 
 __all__ = ['TestSlideStand']
 
@@ -24,6 +25,7 @@ class TestSlideStand:
 
         self.zaber = Stage(settings.zaber_sn)
         self.cam = Cam()
+        self.analyzer = ImageAnalyzer()
 
     def scan(self) -> Dict[float, np.ndarray]:
         self.log.info("Scanning")
@@ -37,8 +39,9 @@ class TestSlideStand:
         for p in self.settings.positions:
             self.log.info("Scanning position %.1f", p)
             self.zaber.abs(p)
-            data[p] = self.cam.snap()
-            print(data[p])
+            img = self.cam.snap()
+            self.analyzer.add_image(p, img)
+
 
         self.log.info("Scan Complete")
         return data
@@ -58,12 +61,3 @@ if __name__ == '__main__':
         with open(f'{angle:.0f}.png', 'wb') as f:
             w = png.Writer(width=img.shape[0], height=img.shape[1], greyscale=True)
             w.write(f, img.T.copy())
-
-
-
-
-
-
-
-
-
