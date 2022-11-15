@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+__version__ = '0.0.1'
+
 import logging
 from typing import Dict
 
