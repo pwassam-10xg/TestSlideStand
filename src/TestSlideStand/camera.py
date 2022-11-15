@@ -19,9 +19,12 @@ class Cam:
         self.nodemap = self.cam.remote_device.node_map
         self.setup()
 
-    def __del__(self):
+    def shutdown(self):
         self.cam.destroy()
         self.h.reset()
+
+    def __del__(self):
+        self.shutdown()
 
     def snap(self) -> np.ndarray:
         shape = (self.nodemap.Height.value, self.nodemap.Width.value)
@@ -41,7 +44,7 @@ class Cam:
         nodemap.Gain.set_value(10)
         self.log.info("Setup complete")
 
-    def auto_exposure(self, iter=100):
+    def auto_exposure(self, iter=25):
         """
         Turn on camera autoexposure. Expose 100 frames. Stop Camera.
         Take the resulting exposure settings as the autoexposure value.
@@ -51,15 +54,29 @@ class Cam:
         self.log.info("Starting autoexposure")
         nodemap.AcquisitionMode.set_value('Continuous')
         nodemap.ExposureAuto.set_value('Continuous')
-        nodemap.AutoExposureExposureTimeUpperLimit.set_value(100000)
+        nodemap.AutoExposureExposureTimeUpperLimit.set_value(30000)
         self.cam.start()
         for i in range(iter):
             buf = self.cam.fetch()
             buf.queue()
             self.log.info("Iteration %d: Exposure: %.2f", i, nodemap.ExposureTime.get_value(ignore_cache=True))
+        buf = self.cam.fetch()
+        shape = (self.nodemap.Height.value, self.nodemap.Width.value)
+        img = buf.payload.components[0].data.copy().reshape(shape)
+        buf.queue()
         self.cam.stop()
         nodemap.ExposureAuto.set_value('Off')
-        return nodemap.ExposureTime.value
+        exp = nodemap.ExposureTime.value
+
+        max_intensity = np.percentile(img, 95.0)
+        exposure_time_to_set = int(exp * 240 / max_intensity)  # set 99.9 percentile to 240
+        nodemap.ExposureTime.set_value(exposure_time_to_set)
+        return exposure_time_to_set
+
+        # print('Exposure time %d', cam.ExposureTime.GetValue())
+        # cam.ExposureTime.SetValue(exposure_time_to_set)  # set exposure time
+        #
+        # return nodemap.ExposureTime.value
 
     def exp(self, exposure: float):
         self.log.info("Setting camera exposure to %.2f", exposure)

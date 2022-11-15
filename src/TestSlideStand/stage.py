@@ -27,6 +27,9 @@ class Stage:
         self.axis = devices[0].get_axis(1)
         return
 
+    def shutdown(self):
+        self.zab.close()
+
     def home(self):
         self.log.info("Homing")
         if self.axis.is_homed():
