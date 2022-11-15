@@ -232,7 +232,11 @@ class ImageAnalyzer:
 
         parallelism = np.nan
         if angle == 0.0:
-            parallelism, _, _ = calculate_edge_parallelism(img, rec_props)
+            try:
+                parallelism, _, _ = calculate_edge_parallelism(img, rec_props)
+            except:
+                self.log.warning("Parallelism failed?")
+                pass
 
         self._results[angle] = {
             'Left': intensity[0],
@@ -243,6 +247,7 @@ class ImageAnalyzer:
             'Bottom left': intensity[5],
             'parallelism': parallelism,
         }
+        print(angle, self._results[angle])
 
     def load_offline(self, basepath: pathlib.Path):
         """
@@ -275,16 +280,12 @@ class ImageAnalyzer:
                 self.add_image(angle, img)
 
     def plot(self, prefix: pathlib.Path):
-        # Finish any pending plots
-        # if self._parallelism is None:
-        #     raise RuntimeError("No 0 degree image for parallelism")
-
         prefix = pathlib.Path(prefix)
         df = pd.DataFrame(self._results.values(), index=self._results.keys())
         df.index.name = 'angle'
         df.sort_index(inplace=True)
 
-        df.to_csv(prefix.with_suffix('.csv'))
+        df.to_csv(prefix/'output.csv')
 
         int_left = df[['Left', 'Top left', 'Bottom left']]
         int_right = df[['Top right', 'Right', 'Bottom right']]
@@ -312,14 +313,15 @@ class ImageAnalyzer:
         ax2.set_ylabel('Intensity variation (% /mm)')
 
         fig.tight_layout()
-        fig.show()
-        fig.savefig(prefix.with_suffix('.pdf'))
-
+        fig.savefig(prefix/'output.pdf')
+        plt.ion()
+        plt.show(block=True)
         return
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    inpath = pathlib.Path('../../data/3')
+    logging.getLogger('matplotlib.font_manager').setLevel(logging.INFO)
+    inpath = pathlib.Path('data/')
     a = ImageAnalyzer(ref=str(inpath))
     a.load_offline(inpath)
     a.plot(inpath / 'output.pdf')
