@@ -1,6 +1,7 @@
 *.png
 .idea/*
 *.exe
+*.tiff
 
 ### Python template
 # Byte-compiled / optimized / DLL files
