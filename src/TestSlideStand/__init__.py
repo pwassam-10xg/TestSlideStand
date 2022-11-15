@@ -46,18 +46,10 @@ class TestSlideStand:
         self.log.info("Scan Complete")
         return data
 
-if __name__ == '__main__':
-    coloredlogs.install(level=logging.DEBUG)
-    t = TestSlideStand(
-        TestSlideStand.Settings(
-            zaber_sn='AC01ZPBDA',
-            positions=[-10, 0, 10]
-        )
-    )
-    data = t.scan()
-
-    import png
-    for angle, img in data.items():
-        with open(f'{angle:.0f}.png', 'wb') as f:
-            w = png.Writer(width=img.shape[0], height=img.shape[1], greyscale=True)
-            w.write(f, img.T.copy())
+    def save(self, datadir: Path):
+        for angle, img in self.data.items():
+            fname = datadir / f'{angle:.0f}deg.png'
+            self.log.info("Writing %s", fname)
+            with open(fname, 'wb') as f:
+                w = png.Writer(width=img.shape[1], height=img.shape[0], greyscale=True, compression=False)
+                w.write(f, img)

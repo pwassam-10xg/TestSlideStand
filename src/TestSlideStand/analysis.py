@@ -1,7 +1,7 @@
 import pathlib
 from typing import Dict, Any
 
-import tifffile
+import png
 import cv2
 import warnings
 import logging
@@ -247,12 +247,12 @@ class ImageAnalyzer:
     def load_offline(self, basepath: pathlib.Path):
         """
         Load from an input directory.
-        Expects a series of files named [angle].tiff
+        Expects a series of files named [angle]deg.png
         :param basepath:
         :return:
         """
 
-        tiffs = basepath.glob('*deg.tiff')
+        tiffs = basepath.glob('*deg.png')
         fnames = {}
         for t in tiffs:
             try:
@@ -263,19 +263,16 @@ class ImageAnalyzer:
                 pass
 
         if len(fnames) == 0:
-            raise FileNotFoundError("Didn't find and valid tiffs")
+            raise FileNotFoundError("Didn't find and valid pngs")
 
         # self._imgs = {}
         # self._intensity = {}
         for angle, fname in fnames.items():
             self.log.info("Loading angle %.2f / %s", angle, fname)
-            img = tifffile.TiffReader(fname).asarray()
-            self.add_image(angle, img)
-
-            # with open(fname, 'rb') as f:
-            #     img = png.Reader(f).read()
-            #     self._imgs[angle] = np.vstack(list(map(np.uint8, img[2])))
-            #     self.process_image(self._imgs[angle], angle)
+            with open(fname, 'rb') as f:
+                img = png.Reader(f).read()
+                img = np.vstack(list(map(np.uint8, img[2])))
+                self.add_image(angle, img)
 
     def plot(self, prefix: pathlib.Path):
         # Finish any pending plots
