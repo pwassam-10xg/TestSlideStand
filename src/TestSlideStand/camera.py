@@ -17,6 +17,7 @@ class Cam:
         cam = h.create({'display_name': 'FLIR Blackfly S BFS-U3-120S4M'})
         self.cam = cam
         self.nodemap = self.cam.remote_device.node_map
+        self.setup()
 
     def __del__(self):
         self.cam.destroy()
@@ -37,7 +38,7 @@ class Cam:
         nodemap.AcquisitionMode.set_value('SingleFrame')
         nodemap.ExposureAuto.set_value('Off')
         nodemap.GainAuto.set_value('Off')
-        nodemap.Gain.set_value(0)
+        nodemap.Gain.set_value(10)
         self.log.info("Setup complete")
 
     def auto_exposure(self, iter=100):
@@ -50,6 +51,7 @@ class Cam:
         self.log.info("Starting autoexposure")
         nodemap.AcquisitionMode.set_value('Continuous')
         nodemap.ExposureAuto.set_value('Continuous')
+        nodemap.AutoExposureExposureTimeUpperLimit.set_value(100000)
         self.cam.start()
         for i in range(iter):
             buf = self.cam.fetch()
@@ -63,7 +65,6 @@ class Cam:
         self.log.info("Setting camera exposure to %.2f", exposure)
         self.nodemap.ExposureTime.set_value(exposure)
         self.log.info("Actual exposure: %.3f", self.nodemap.ExposureTime.value)
-        # self.cam.ExposureTime(int(exposure))
 
 if __name__ == '__main__':
     coloredlogs.install(level=logging.DEBUG)

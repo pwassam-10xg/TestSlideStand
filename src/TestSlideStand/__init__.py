@@ -40,8 +40,7 @@ class TestSlideStand:
             self.log.info("Scanning position %.1f", p)
             self.zaber.abs(p)
             img = self.cam.snap()
-            self.analyzer.add_image(p, img)
-
+            data[p] = img
 
         self.log.info("Scan Complete")
         return data
