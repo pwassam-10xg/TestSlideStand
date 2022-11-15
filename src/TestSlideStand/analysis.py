@@ -298,7 +298,7 @@ class ImageAnalyzer:
         fig.suptitle(f'Plots for {self.ref}')
 
         ax1.set_title('Light intensity - angle dependence')
-        for col in df.columns:
+        for col in ['Left', 'Top left', 'Bottom left', 'Top right', 'Right', 'Bottom right']:
             ax1.plot(df.index, df[col], '*', label=col)
 
         ax1.legend(loc='best')
