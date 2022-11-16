@@ -11,14 +11,20 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>TestSlideStand</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="1" column="3">
      <widget class="QLabel" name="label_exposure">
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="text">
-       <string>TextLabel</string>
+       <string/>
       </property>
      </widget>
     </item>
@@ -70,16 +76,22 @@
      </widget>
     </item>
     <item row="1" column="0">
-     <widget class="QPushButton" name="button_acquire">
+     <widget class="QPushButton" name="button_measure">
       <property name="text">
-       <string>Acquire</string>
+       <string>Measure</string>
       </property>
      </widget>
     </item>
     <item row="1" column="5">
      <widget class="QLabel" name="label_angle">
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="text">
-       <string>TextLabel</string>
+       <string/>
       </property>
      </widget>
     </item>
@@ -98,8 +110,10 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionLoad"/>
     <addaction name="actionSave"/>
     <addaction name="actionExit"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -124,6 +138,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionLoad">
+   <property name="text">
+    <string>Load</string>
    </property>
   </action>
  </widget>
