@@ -25,6 +25,7 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
     exposure = pyqtSignal(float)
     angle = pyqtSignal(float)
     status = pyqtSignal(str)
+    parallel = pyqtSignal(float)
     newdata = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -43,12 +44,14 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
         dispatcher.connect(lambda x: self.angle.emit(x),    'ANGLE',    weak=False)
         dispatcher.connect(lambda x: self.status.emit(x),   'STATUS',   weak=False)
         dispatcher.connect(lambda:   self.newdata.emit(),   'NEWDATA',  weak=False)
+        dispatcher.connect(lambda x: self.parallel.emit(x), 'PARALLEL', weak=False)
 
         self.frame.connect(self.on_frame)
         self.exposure.connect(self.on_exposure)
         self.angle.connect(self.on_angle)
         self.status.connect(self.on_status)
         self.newdata.connect(self.on_newdata)
+        self.parallel.connect(self.on_parallel)
 
         self.show()
 
@@ -81,6 +84,10 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
         data = self.s.analyzer._results
         df = pd.DataFrame(data.values(), index=data.keys())
         self.plots.plot_data(df)
+
+    @pyqtSlot(float)
+    def on_parallel(self, parallelism: float):
+        self.label_parallelism.setText(f'{parallelism:.1f}')
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(name)20s %(levelname)s %(message)s', level=logging.INFO)

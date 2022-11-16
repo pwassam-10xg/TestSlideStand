@@ -243,6 +243,7 @@ class ImageAnalyzer:
         if angle == 0.0:
             try:
                 parallelism, _, _ = calculate_edge_parallelism(img, rec_props)
+                dispatcher.send('PARALLEL', dispatcher.Any, parallelism)
             except:
                 self.log.warning("Parallelism failed?")
                 pass
