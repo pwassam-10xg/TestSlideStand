@@ -7,6 +7,8 @@ import warnings
 import logging
 import pandas as pd
 import numpy as np
+from pathlib import Path
+from pydispatch import dispatcher
 
 import matplotlib.pyplot as plt
 from skimage.morphology import (
@@ -216,11 +218,18 @@ def calculate_edge_parallelism(image, rec_props, margin_pix=100):
 ## LIBS ABOVE
 
 class ImageAnalyzer:
-    def __init__(self, ref: str):
+    def __init__(self):
         self.log = logging.getLogger(self.__class__.__name__)
         self._imgs: Dict[float, np.ndarray] = {}
         self._results: Dict[float, Dict[str, Any]] = {}
-        self.ref = ref
+
+    def save(self, datadir: Path):
+        for angle, img in self._imgs.items():
+            fname = datadir / f'{angle:.0f}deg.png'
+            self.log.info("Writing %s", fname)
+            with open(fname, 'wb') as f:
+                w = png.Writer(width=img.shape[1], height=img.shape[0], greyscale=True, compression=False)
+                w.write(f, img)
 
     def add_image(self, angle: float, img):
         self._imgs[angle] = img
@@ -247,7 +256,8 @@ class ImageAnalyzer:
             'Bottom left': intensity[5],
             'parallelism': parallelism,
         }
-        print(angle, self._results[angle])
+        dispatcher.send('NEWDATA', dispatcher.Any)
+
 
     def load_offline(self, basepath: pathlib.Path):
         """
@@ -257,14 +267,14 @@ class ImageAnalyzer:
         :return:
         """
 
-        tiffs = basepath.glob('*deg.png')
+        pngs = basepath.glob('*deg.png')
         fnames = {}
-        for t in tiffs:
+        for img in pngs:
             try:
-                fnames[int(t.stem.replace('deg', ''))] = t
+                fnames[int(img.stem.replace('deg', ''))] = img
 
             except ValueError:
-                self.log.warning('Skipping file %s', t)
+                self.log.warning('Skipping file %s', img)
                 pass
 
         if len(fnames) == 0:

@@ -3,6 +3,7 @@ import coloredlogs
 from zaber_motion import Units
 from zaber_motion.ascii import Connection
 import serial.tools.list_ports
+from pydispatch import dispatcher
 
 __all__ = ['Stage']
 
@@ -35,17 +36,23 @@ class Stage:
         if self.axis.is_homed():
             self.log.info("Already homed moving to abs 0")
             self.axis.move_absolute(0)
-        self.axis.move_relative(45)
+        self.axis.move_relative(35)
         self.axis.home()
+        dispatcher.send('ANGLE', dispatcher.Any, self.pos())
+
+    def pos(self):
+        return self.axis.get_position(Units.ANGLE_DEGREES)
 
     def abs(self, degrees: float):
         self.log.info("Moving absolute %.3f degrees", degrees)
         self.axis.move_absolute(degrees, Units.ANGLE_DEGREES)
+        dispatcher.send('ANGLE', dispatcher.Any, self.pos())
         self.log.info("Move complete")
 
     def rel(self, degrees: float):
         self.log.info("Moving relative %.3f degrees", degrees)
         self.axis.move_relative(degrees, Units.ANGLE_DEGREES)
+        dispatcher.send('ANGLE', dispatcher.Any, self.pos())
         self.log.info("Move complete")
 
 if __name__ == '__main__':

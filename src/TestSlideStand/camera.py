@@ -2,6 +2,7 @@ import logging
 from harvesters.core import Harvester
 import numpy as np
 import coloredlogs
+from pydispatch import dispatcher
 
 __all__ = ['Cam']
 
@@ -33,6 +34,7 @@ class Cam:
         ret = buf.payload.components[0].data.copy().reshape(shape)
         buf.queue()
         self.cam.stop()
+        dispatcher.send('FRAME', dispatcher.Any, ret)
         return ret
 
     def setup(self):
@@ -55,9 +57,12 @@ class Cam:
         nodemap.AcquisitionMode.set_value('Continuous')
         nodemap.ExposureAuto.set_value('Continuous')
         nodemap.AutoExposureExposureTimeUpperLimit.set_value(30000)
+        shape = (self.nodemap.Height.value, self.nodemap.Width.value)
         self.cam.start()
         for i in range(iter):
             buf = self.cam.fetch()
+            ret = buf.payload.components[0].data.copy().reshape(shape)
+            dispatcher.send('FRAME', dispatcher.Any, ret)
             buf.queue()
             self.log.info("Iteration %d: Exposure: %.2f", i, nodemap.ExposureTime.get_value(ignore_cache=True))
         buf = self.cam.fetch()
@@ -70,7 +75,7 @@ class Cam:
 
         max_intensity = np.percentile(img, 95.0)
         exposure_time_to_set = int(exp * 240 / max_intensity)  # set 99.9 percentile to 240
-        nodemap.ExposureTime.set_value(exposure_time_to_set)
+        self.exp(exposure_time_to_set)
         return exposure_time_to_set
 
         # print('Exposure time %d', cam.ExposureTime.GetValue())
@@ -81,6 +86,7 @@ class Cam:
     def exp(self, exposure: float):
         self.log.info("Setting camera exposure to %.2f", exposure)
         self.nodemap.ExposureTime.set_value(exposure)
+        dispatcher.send('EXPOSURE', dispatcher.Any, exposure)
         self.log.info("Actual exposure: %.3f", self.nodemap.ExposureTime.value)
 
 if __name__ == '__main__':
