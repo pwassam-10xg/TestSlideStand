@@ -37,7 +37,7 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
 
         self.actionExit.triggered.connect(self.close)
 
-        self.button_acquire.clicked.connect(self.on_measure)
+        self.button_measure.clicked.connect(self.on_measure)
         dispatcher.connect(lambda x: self.frame.emit(x),    'FRAME',    weak=False)
         dispatcher.connect(lambda x: self.exposure.emit(x), 'EXPOSURE', weak=False)
         dispatcher.connect(lambda x: self.angle.emit(x),    'ANGLE',    weak=False)
