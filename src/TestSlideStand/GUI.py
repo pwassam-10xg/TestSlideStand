@@ -1,6 +1,7 @@
+from pathlib import Path
 from typing import Optional
 
-from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
 
 import numpy as np
@@ -40,6 +41,8 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
         self.ref: Optional[str] = None
 
         self.actionExit.triggered.connect(self.close)
+        self.actionSave.triggered.connect(self.on_save)
+        self.actionLoad.triggered.connect(self.on_load)
 
         self.button_measure.clicked.connect(self.on_measure)
         dispatcher.connect(lambda x: self.frame.emit(x),    'FRAME',    weak=False)
@@ -58,33 +61,56 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
 
         self.button_measure.setDisabled(True)
         self.lineEdit_ref.textChanged.connect(self.on_ref)
-
         self.show()
+
+    @pyqtSlot()
+    def on_save(self):
+        if not self.ref:
+            self.statusbar.showMessage("No reference")
+            return
+
+        if self.thread and self.thread.isRunning():
+            self.statusbar.showMessage('Cant save while measuring')
+            return
+
+        dialog = SaveDialog()
+        dirname = dialog.getSaveFileName(directory=str(settings.datadir))
+        if dirname:
+            dirname = Path(dirname[0])
+            dirname.mkdir(parents=True, exist_ok=True)
+            self.s.analyzer.save(dirname, ref=self.ref)
+
+    @pyqtSlot()
+    def on_load(self):
+        pass
 
     @pyqtSlot()
     def on_ref(self):
         ret = self.lineEdit_ref.text().strip()
         if ret == '':
             self.ret = None
-            self.button_measure.setDisabled()
+            self.button_measure.setDisabled(True)
         else:
             self.ret = ret
-            self.button_measure.setEnabled()
+            self.button_measure.setEnabled(True)
 
     @pyqtSlot()
     def on_measure(self):
-        print("Measure")
         if self.thread and self.thread.isRunning():
             self.statusbar.showMessage('Already measuring')
         else:
+            self.lineEdit_ref.setDisabled(True)
+            self.ref = self.lineEdit_ref.text().strip()
+            self.button_measure.setDisabled(True)
             self.thread = TestSlideWorkThread(self.s)
             self.thread.start()
             self.thread.finished.connect(self.on_measure_finished)
 
     @pyqtSlot()
     def on_measure_finished(self):
-        self.button_measure.setDisabled()
+        self.button_measure.setDisabled(True)
         self.lineEdit_ref.clear()
+        self.lineEdit_ref.setEnabled(True)
 
     @pyqtSlot(np.ndarray)
     def on_frame(self, frame: np.ndarray):
@@ -113,6 +139,15 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
     @pyqtSlot(float)
     def on_parallel(self, parallelism: float):
         self.label_parallelism.setText(f'{parallelism:.4f}')
+
+class SaveDialog(QFileDialog):
+    def __init__(self):
+        super().__init__()
+
+        self.FileMode = QFileDialog.FileMode.Directory
+        self.Options = QFileDialog.Option.ShowDirsOnly
+        self.ViewMode = QFileDialog.ViewMode.Detail
+
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(name)20s %(levelname)s %(message)s', level=logging.INFO)

@@ -1,5 +1,5 @@
 import pathlib
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 import png
 import cv2
@@ -222,14 +222,23 @@ class ImageAnalyzer:
         self.log = logging.getLogger(self.__class__.__name__)
         self._imgs: Dict[float, np.ndarray] = {}
         self._results: Dict[float, Dict[str, Any]] = {}
+        self.df: Optional[pd.DataFrame] = None
 
-    def save(self, datadir: Path):
+    def save(self, datadir: Path, ref: str):
+        # Save images
         for angle, img in self._imgs.items():
             fname = datadir / f'{angle:.0f}deg.png'
             self.log.info("Writing %s", fname)
             with open(fname, 'wb') as f:
                 w = png.Writer(width=img.shape[1], height=img.shape[0], greyscale=True, compression=False)
                 w.write(f, img)
+
+        # Save data
+        self.df = pd.DataFrame(self._results.values(), index=self._results.keys()).sort_index()
+        self.df.index.name = 'angle'
+        self.df.to_csv(datadir/f'{ref}_data.csv')
+        self.plot(self.df, datadir/f'{ref}.pdf', ref, display=False)
+        self.plot(self.df, datadir/f'{ref}.png', ref, display=False)
 
     def add_image(self, angle: float, img):
         self._imgs[angle] = img
@@ -290,14 +299,7 @@ class ImageAnalyzer:
                 img = np.vstack(list(map(np.uint8, img[2])))
                 self.add_image(angle, img)
 
-    def plot(self, prefix: pathlib.Path):
-        prefix = pathlib.Path(prefix)
-        df = pd.DataFrame(self._results.values(), index=self._results.keys())
-        df.index.name = 'angle'
-        df.sort_index(inplace=True)
-
-        df.to_csv(prefix/'output.csv')
-
+    def plot(self, df: pd.DataFrame, fname: pathlib.Path, ref: str, display=False):
         int_left = df[['Left', 'Top left', 'Bottom left']]
         int_right = df[['Top right', 'Right', 'Bottom right']]
         int_spatial_var = 100*(np.nanmean(int_left, axis = 1) - np.nanmean(int_right, axis = 1))/(12*df.mean(axis=1))
@@ -306,11 +308,11 @@ class ImageAnalyzer:
         ax1: plt.Axes
         ax2: plt.Axes
 
-        fig.suptitle(f'Plots for {self.ref}')
+        fig.suptitle(f'Plots for {ref}')
 
         ax1.set_title('Light intensity - angle dependence')
         for col in ['Left', 'Top left', 'Bottom left', 'Top right', 'Right', 'Bottom right']:
-            ax1.plot(df.index, df[col], '*', label=col)
+            ax1.plot(df.index, df[col], '-o', label=col)
 
         ax1.legend(loc='best')
         ax1.set_xlabel('Angles (deg)')
@@ -318,15 +320,16 @@ class ImageAnalyzer:
         ax1.grid()
 
         ax2.set_title('Light intensity - spatial dependence')
-        ax2.plot(df.index, int_spatial_var, '*')
+        ax2.plot(df.index, int_spatial_var, '-o')
         ax2.grid()
         ax2.set_xlabel('Angles (deg)')
         ax2.set_ylabel('Intensity variation (% /mm)')
 
         fig.tight_layout()
-        fig.savefig(prefix/'output.pdf')
-        plt.ion()
-        plt.show(block=True)
+        fig.savefig(fname)
+        if display:
+            plt.ion()
+            plt.show(block=True)
         return
 
 if __name__ == '__main__':

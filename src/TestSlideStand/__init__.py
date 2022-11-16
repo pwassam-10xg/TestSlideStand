@@ -19,9 +19,9 @@ __all__ = ['TestSlideStand']
 class TestSlideStand:
     @dataclass
     class Settings:
-        zaber_sn: str                                    # FTDI serial number of zaber
-        positions: np.ndarray = np.arange(-30, 30, 2)    # Positions to scan
-        auto_exp_pos: float = -30                        # Auto exposure position in degrees
+        zaber_sn: str                                      # FTDI serial number of zaber
+        positions: np.ndarray = np.arange(-30, 30.1, 2)    # Positions to scan
+        auto_exp_pos: float = -30                          # Auto exposure position in degrees
         datadir: Path = Path(r'c:\TestSlideStandData')
 
     def __init__(self, settings: Settings, ref: str):

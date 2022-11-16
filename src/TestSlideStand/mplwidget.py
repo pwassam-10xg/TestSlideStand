@@ -32,12 +32,12 @@ class MplWidget(FigureCanvasQTAgg):
         ax1.set_ylabel('Intensity')
         ax1.grid()
         for label in self.labels:
-            self.angle_plots[label] = ax1.plot([], [], '*', label=label)[0]
+            self.angle_plots[label] = ax1.plot([], [], '-o', label=label)[0]
         ax1.legend(loc='best')
         ax1.set_xlim(-30, 30)
 
         ax2.set_title('Light intensity - spatial dependence')
-        self.spatial_plot = ax2.plot([], [], '*')[0]
+        self.spatial_plot = ax2.plot([], [], '-o')[0]
         ax2.grid()
         ax2.set_xlabel('Angles (deg)')
         ax2.set_ylabel('Intensity variation (%/mm)')
@@ -60,13 +60,13 @@ class MplWidget(FigureCanvasQTAgg):
         ax1.set_ylabel('Intensity')
         ax1.grid()
         for label in self.labels:
-            self.angle_plots[label] = ax1.plot(df.index, df[label], '*', label=label)[0]
+            self.angle_plots[label] = ax1.plot(df.index, df[label], '-o', label=label, alpha=0.75)[0]
         ax1.legend(loc='best')
         ax1.set_xlim(-30, 30)
         ax1.set_ylim(0, 255)
 
         ax2.set_title('Light intensity - spatial dependence')
-        self.spatial_plot = ax2.plot([], [], '*')[0]
+        self.spatial_plot = ax2.plot([], [], '-o')[0]
         ax2.grid()
         ax2.set_xlabel('Angles (deg)')
         ax2.set_ylabel('Intensity variation (%/mm)')
@@ -74,16 +74,7 @@ class MplWidget(FigureCanvasQTAgg):
         ax2.set_ylim(0, 10.0)
 
         for label in self.labels:
-            self.angle_plots[label] = ax1.plot(df.index, df[label], '*', label=label)[0]
+            self.angle_plots[label] = ax1.plot(df.index, df[label], '-o', label=label, alpha=0.75)[0]
 
-        self.spatial_plot = ax2.plot(df.index, int_spatial_var, '*')[0]
-
+        self.spatial_plot = ax2.plot(df.index, int_spatial_var, '-o')[0]
         self.draw()
-
-
-        #
-        # for label in self.labels:
-        #     self.angle_plots[label].set_data(df.index, df[label])
-        #
-        # self.spatial_plot.set_data(df.index, int_spatial_var)
-        #
