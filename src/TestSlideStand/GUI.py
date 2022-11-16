@@ -1,3 +1,5 @@
+from typing import Optional
+
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
 
@@ -30,11 +32,12 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.thread = None
+        self.thread: Optional[TestSlideWorkThread] = None
         self.log = logging.getLogger(self.__class__.__name__)
 
         self.setupUi(self)
         self.s = TestSlideStand(settings=settings, ref='none')
+        self.ref: Optional[str] = None
 
         self.actionExit.triggered.connect(self.close)
 
@@ -53,13 +56,35 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
         self.newdata.connect(self.on_newdata)
         self.parallel.connect(self.on_parallel)
 
+        self.button_measure.setDisabled(True)
+        self.lineEdit_ref.textChanged.connect(self.on_ref)
+
         self.show()
+
+    @pyqtSlot()
+    def on_ref(self):
+        ret = self.lineEdit_ref.text().strip()
+        if ret == '':
+            self.ret = None
+            self.button_measure.setDisabled()
+        else:
+            self.ret = ret
+            self.button_measure.setEnabled()
 
     @pyqtSlot()
     def on_measure(self):
         print("Measure")
-        self.thread = TestSlideWorkThread(self.s)
-        self.thread.start()
+        if self.thread and self.thread.isRunning():
+            self.statusbar.showMessage('Already measuring')
+        else:
+            self.thread = TestSlideWorkThread(self.s)
+            self.thread.start()
+            self.thread.finished.connect(self.on_measure_finished)
+
+    @pyqtSlot()
+    def on_measure_finished(self):
+        self.button_measure.setDisabled()
+        self.lineEdit_ref.clear()
 
     @pyqtSlot(np.ndarray)
     def on_frame(self, frame: np.ndarray):
