@@ -87,7 +87,7 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
 
     @pyqtSlot(float)
     def on_parallel(self, parallelism: float):
-        self.label_parallelism.setText(f'{parallelism:.1f}')
+        self.label_parallelism.setText(f'{parallelism:.4f}')
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(name)20s %(levelname)s %(message)s', level=logging.INFO)
