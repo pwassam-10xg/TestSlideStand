@@ -29,7 +29,7 @@ class Ui_TestSlideStand(object):
         self.gridLayout.addItem(spacerItem, 1, 6, 1, 1)
         self.gridLayout_2 = QtWidgets.QGridLayout()
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.iv = PlotWidget(self.centralwidget)
+        self.iv = ImageView(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -93,4 +93,4 @@ class Ui_TestSlideStand(object):
         self.actionExit.setText(_translate("TestSlideStand", "Exit"))
         self.actionAbout.setText(_translate("TestSlideStand", "About"))
 from mplwidget import MplWidget
-from pyqtgraph import PlotWidget
+from pyqtgraph import ImageView
