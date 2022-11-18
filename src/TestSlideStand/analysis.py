@@ -1,4 +1,5 @@
 import pathlib
+import sys
 from typing import Dict, Any, Optional
 
 import png
@@ -8,6 +9,8 @@ import logging
 import pandas as pd
 import numpy as np
 from pathlib import Path
+
+from PyQt5.QtWidgets import QFileDialog, QApplication
 from pydispatch import dispatcher
 
 import matplotlib.pyplot as plt
@@ -299,6 +302,8 @@ class ImageAnalyzer:
                 img = np.vstack(list(map(np.uint8, img[2])))
                 self.add_image(angle, img)
 
+        self.df = pd.DataFrame(self._results.values(), index=self._results.keys()).sort_index()
+
     def plot(self, df: pd.DataFrame, fname: pathlib.Path, ref: str, display=False):
         int_left = df[['Left', 'Top left', 'Bottom left']]
         int_right = df[['Top right', 'Right', 'Bottom right']]
@@ -336,8 +341,19 @@ class ImageAnalyzer:
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('matplotlib.font_manager').setLevel(logging.INFO)
-    inpath = pathlib.Path('data/')
-    a = ImageAnalyzer(ref=str(inpath))
-    a.load_offline(inpath)
-    a.plot(inpath / 'output.pdf')
+
+    while 1:
+        app = QApplication(sys.argv)
+        app.setQuitOnLastWindowClosed(True)
+        dialog = QFileDialog()
+        dialog.FileMode = dialog.FileMode.Directory
+        dialog.ViewMode = QFileDialog.ViewMode.Detail
+        inpath = dialog.getExistingDirectory()
+        if inpath:
+            inpath = Path(inpath)
+            a = ImageAnalyzer()
+            a.load_offline(inpath)
+            a.plot(df=a.df, fname=inpath / 'output.pdf', ref=str(inpath), display=True)
+        else:
+            break
 
