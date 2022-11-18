@@ -303,12 +303,13 @@ class ImageAnalyzer:
         int_left = df[['Left', 'Top left', 'Bottom left']]
         int_right = df[['Top right', 'Right', 'Bottom right']]
         int_spatial_var = 100*(np.nanmean(int_left, axis = 1) - np.nanmean(int_right, axis = 1))/(12*df.mean(axis=1))
+        parallelism = df['parallelism']
 
         fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12, 5))
         ax1: plt.Axes
         ax2: plt.Axes
 
-        fig.suptitle(f'Plots for {ref}')
+        fig.suptitle('Plots for %s \n Parallelism is %.3f deg' %(ref, np.nanmean(parallelism)) )
 
         ax1.set_title('Light intensity - angle dependence')
         for col in ['Left', 'Top left', 'Bottom left', 'Top right', 'Right', 'Bottom right']:
