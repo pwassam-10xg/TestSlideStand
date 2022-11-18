@@ -147,11 +147,3 @@ class SaveDialog(QFileDialog):
         self.FileMode = QFileDialog.FileMode.Directory
         self.Options = QFileDialog.Option.ShowDirsOnly
         self.ViewMode = QFileDialog.ViewMode.Detail
-
-
-if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s %(name)20s %(levelname)s %(message)s', level=logging.INFO)
-    logging.getLogger('matplotlib.font_manager').setLevel(logging.INFO)
-    app = QApplication(sys.argv)
-    win = TestSlideStandGUI()
-    app.exec()

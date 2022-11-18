@@ -116,5 +116,5 @@ class Ui_TestSlideStand(object):
         self.actionExit.setText(_translate("TestSlideStand", "Exit"))
         self.actionAbout.setText(_translate("TestSlideStand", "About"))
         self.actionLoad.setText(_translate("TestSlideStand", "Load"))
-from mplwidget import MplWidget
+from TestSlideStand.mplwidget import MplWidget
 from pyqtgraph import ImageView

@@ -187,7 +187,7 @@
   <customwidget>
    <class>MplWidget</class>
    <extends>QWidget</extends>
-   <header>mplwidget</header>
+   <header>TestSlideStand.mplwidget</header>
    <container>1</container>
   </customwidget>
   <customwidget>

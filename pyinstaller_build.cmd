@@ -1,1 +1,1 @@
-pyinstaller --noconfirm TestSlideStand.spec
+pyinstaller --clean --noconfirm TestSlideStand.spec
