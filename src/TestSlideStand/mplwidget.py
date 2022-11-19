@@ -22,6 +22,12 @@ class MplWidget(FigureCanvasQTAgg):
         self.setup_plots()
         self.updateGeometry()
 
+    def reset(self):
+        ax1, ax2 = self.axs
+        ax1.cla()
+        ax2.cla()
+        self.draw()
+
     def setup_plots(self):
         fig = self.fig
         ax1, ax2 = self.axs
@@ -51,8 +57,7 @@ class MplWidget(FigureCanvasQTAgg):
         int_spatial_var = 100 * (np.nanmean(int_left, axis=1) - np.nanmean(int_right, axis=1)) / (12 * df.mean(axis=1))
         ax1, ax2 = self.axs
 
-        ax1.cla()
-        ax2.cla()
+        self.reset()
 
         ax1.set_title('Light intensity - angle dependence')
         ax1.legend(loc='best')

@@ -227,6 +227,11 @@ class ImageAnalyzer:
         self._results: Dict[float, Dict[str, Any]] = {}
         self.df: Optional[pd.DataFrame] = None
 
+    def reset(self):
+        self._imgs = {}
+        self._results = {}
+        self.df = None
+
     def save(self, datadir: Path, ref: str):
         # Save images
         for angle, img in self._imgs.items():
