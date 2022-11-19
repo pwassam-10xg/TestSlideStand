@@ -11,6 +11,7 @@ import pandas as pd
 from TestSlideStand.ui_TestSlideStand import Ui_TestSlideStand
 
 from TestSlideStand import TestSlideStand
+from TestSlideStand import __version__ as TestSlideStandversion
 from TestSlideStand.settings import settings
 from pydispatch import dispatcher
 
@@ -36,6 +37,7 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
         self.log = logging.getLogger(self.__class__.__name__)
 
         self.setupUi(self)
+        self.setWindowTitle(f'TestSlideStand {TestSlideStandversion}')
         self.s = TestSlideStand(settings=settings, ref='none')
         self.ref: Optional[str] = None
 

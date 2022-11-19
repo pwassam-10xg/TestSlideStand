@@ -1,8 +1,7 @@
-__version__ = '0.0.1'
+__version__ = '0.0.3'
 
 import logging
 import numpy as np
-import png
 
 from typing import Dict
 from dataclasses import dataclass
