@@ -102,6 +102,8 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
             self.lineEdit_ref.setDisabled(True)
             self.ref = self.lineEdit_ref.text().strip()
             self.button_measure.setDisabled(True)
+            self.s.analyzer.reset()
+            self.plots.reset()
             self.thread = TestSlideWorkThread(self.s)
             self.thread.start()
             self.thread.finished.connect(self.on_measure_finished)
