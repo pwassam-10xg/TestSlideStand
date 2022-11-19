@@ -1,12 +1,11 @@
 from pathlib import Path
 from typing import Optional
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QFileDialog
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
 
 import numpy as np
 import logging
-import sys
 import pandas as pd
 
 from TestSlideStand.ui_TestSlideStand import Ui_TestSlideStand
@@ -117,7 +116,7 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
     @pyqtSlot(np.ndarray)
     def on_frame(self, frame: np.ndarray):
         self.log.info("Frame")
-        self.iv.setImage(frame)
+        self.iv.setImage(np.flipud(frame))
         self.log.info("Frame")
 
     @pyqtSlot(float)
