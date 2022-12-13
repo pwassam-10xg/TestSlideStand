@@ -309,6 +309,28 @@ class ImageAnalyzer:
 
         self.df = pd.DataFrame(self._results.values(), index=self._results.keys()).sort_index()
 
+    # TODO unify plotting and GUI analysis instead of duplciating below
+    # TODO only create the df in one location
+
+    def finalize(self):
+        df = pd.DataFrame(self._results.values(), index=self._results.keys()).sort_index()
+        df.index.name = 'angle'
+
+        int_left = df[['Top left', 'Bottom left']]
+        int_right = df[['Top right', 'Bottom right']]
+        int_left_mean = np.nanmean(int_left, axis = 1)
+        int_right_mean = np.nanmean(int_right, axis = 1)
+        int_angle_left = 100*(int_left_mean[0] - int_left_mean[-1])/ int_left_mean.mean()
+        int_angle_right = 100*(int_right_mean[0] - int_right_mean[-1]) / int_right_mean.mean()
+        int_mean = (int_left_mean + int_right_mean)/2
+        int_spatial_var = 100 * (int_left_mean - int_right_mean) / (12 * int_mean)
+
+        angle_dep = np.max([int_angle_left, int_angle_right])
+        spatial_dep = int_spatial_var.max()
+
+        dispatcher.send('FINAL_ANGULAR', dispatcher.Any, angle_dep)
+        dispatcher.send('FINAL_SPATIAL', dispatcher.Any, spatial_dep)
+
     def plot(self, df: pd.DataFrame, fname: pathlib.Path, ref: str, display=False):
         int_left = df[['Top left', 'Bottom left']]
         int_right = df[['Top right', 'Bottom right']]

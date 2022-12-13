@@ -54,6 +54,8 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
         dispatcher.connect(lambda x: self.status.emit(x),   'STATUS',   weak=False)
         dispatcher.connect(lambda:   self.newdata.emit(),   'NEWDATA',  weak=False)
         dispatcher.connect(lambda x: self.parallel.emit(x), 'PARALLEL', weak=False)
+        dispatcher.connect(lambda x: self.final_spatial.emit(x), 'FINAL_SPATIAL', weak=False)
+        dispatcher.connect(lambda x: self.final_angular.emit(x), 'FINAL_ANGULAR', weak=False)
 
         self.frame.connect(self.on_frame)
         self.exposure.connect(self.on_exposure)
@@ -108,6 +110,9 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
             self.ref = self.lineEdit_ref.text().strip()
             self.button_measure.setDisabled(True)
             self.s.analyzer.reset()
+            self.label_angle_dep.clear()
+            self.label_parallelism.clear()
+            self.label_spatial_dep.clear()
             self.plots.reset()
             self.thread = TestSlideWorkThread(self.s)
             self.thread.start()
@@ -145,15 +150,15 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
 
     @pyqtSlot(float)
     def on_parallel(self, parallelism: float):
-        self.label_parallelism.setText(f'{parallelism:.4f}')
+        self.label_parallelism.setText(f'{parallelism:.2f}')
 
     @pyqtSlot(float)
     def on_final_angular(self, v: float):
-        self.label_angle_dep.setText(f'{v:.3f} %')
+        self.label_angle_dep.setText(f'{v:.1f} %')
 
     @pyqtSlot(float)
     def on_final_spatial(self, v: float):
-        self.label_spatial_dep.setText(f'{v:.3f} %')
+        self.label_spatial_dep.setText(f'{v:.1f} %')
 
 class SaveDialog(QFileDialog):
     def __init__(self):
