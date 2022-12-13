@@ -52,8 +52,8 @@ class MplWidget(FigureCanvasQTAgg):
         # fig.tight_layout()
 
     def plot_data(self, df: pd.DataFrame):
-        int_left = df[['Left', 'Top left', 'Bottom left']]
-        int_right = df[['Top right', 'Right', 'Bottom right']]
+        int_left = df[['Top left', 'Bottom left']]
+        int_right = df[['Top right', 'Bottom right']]
         int_left_mean = np.nanmean(int_left, axis = 1)
         int_right_mean = np.nanmean(int_right, axis = 1)
         int_mean = (int_left_mean + int_right_mean)/2
