@@ -314,6 +314,8 @@ class ImageAnalyzer:
         int_right = df[['Top right', 'Bottom right']]
         int_left_mean = np.nanmean(int_left, axis = 1)
         int_right_mean = np.nanmean(int_right, axis = 1)
+        int_angle_left = 100*(int_left_mean[0] - int_left_mean[-1])/ int_left_mean.mean()
+        int_angle_right = 100*(int_right_mean[0] - int_right_mean[-1]) / int_right_mean.mean()
         int_mean = (int_left_mean + int_right_mean)/2
         int_spatial_var = 100 * (int_left_mean - int_right_mean) / (12 * int_mean)
         parallelism = df['parallelism']
@@ -322,9 +324,9 @@ class ImageAnalyzer:
         ax1: plt.Axes
         ax2: plt.Axes
 
-        fig.suptitle('Plots for %s \n Parallelism is %.3f deg' %(ref, np.nanmean(parallelism)) )
+        fig.suptitle('Plots for %s \n Parallelism = %.3f deg' %(ref, np.nanmean(parallelism)) )
 
-        ax1.set_title('Light intensity - angle dependence')
+        ax1.set_title('Light intensity - angle dependence \n max = %.1f%%' % np.max([int_angle_left, int_angle_right]))
         for col in ['Left', 'Top left', 'Bottom left', 'Top right', 'Right', 'Bottom right']:
             ax1.plot(df.index, df[col], '-o', label=col)
 
@@ -333,7 +335,7 @@ class ImageAnalyzer:
         ax1.set_ylabel('Intensity')
         ax1.grid()
 
-        ax2.set_title('Light intensity - spatial dependence')
+        ax2.set_title('Light intensity - spatial dependence \n max = %.1f%%' % int_spatial_var.max())
         ax2.plot(df.index, int_spatial_var, '-o')
         ax2.grid()
         ax2.set_xlabel('Angles (deg)')
