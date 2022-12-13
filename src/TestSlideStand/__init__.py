@@ -55,6 +55,8 @@ class TestSlideStand:
             img = self.cam.snap()
             self.analyzer.add_image(p, img)
 
+        self.analyzer.finalize()
+
         self.zaber.abs(0)
         self.cam.snap()
         self.status("Scan Complete")

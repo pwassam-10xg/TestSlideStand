@@ -30,6 +30,8 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
     status = pyqtSignal(str)
     parallel = pyqtSignal(float)
     newdata = pyqtSignal()
+    final_angular = pyqtSignal(float)
+    final_spatial = pyqtSignal(float)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -59,6 +61,8 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
         self.status.connect(self.on_status)
         self.newdata.connect(self.on_newdata)
         self.parallel.connect(self.on_parallel)
+        self.final_angular.connect(self.on_final_angular)
+        self.final_spatial.connect(self.on_final_spatial)
 
         self.button_measure.setDisabled(True)
         self.lineEdit_ref.textChanged.connect(self.on_ref)
@@ -142,6 +146,14 @@ class TestSlideStandGUI(QMainWindow, Ui_TestSlideStand):
     @pyqtSlot(float)
     def on_parallel(self, parallelism: float):
         self.label_parallelism.setText(f'{parallelism:.4f}')
+
+    @pyqtSlot(float)
+    def on_final_angular(self, v: float):
+        self.label_angle_dep.setText(f'{v:.3f} %')
+
+    @pyqtSlot(float)
+    def on_final_spatial(self, v: float):
+        self.label_spatial_dep.setText(f'{v:.3f} %')
 
 class SaveDialog(QFileDialog):
     def __init__(self):
